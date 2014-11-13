@@ -1,1 +1,1 @@
-__author__ = 'wil'
+from .models import db

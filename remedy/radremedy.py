@@ -1,22 +1,19 @@
-#!/usr/bin/env python
 """
 radremedy.py
 
 Main web application file. Contains initial setup of database, API, and other components.
 Also contains the setup of the routes.
 """
-from flask import Flask, url_for, request, abort
-from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
+from flask import Flask
 from flask.ext.login import current_user
+from remedy.config import get_config_by
+from remedy.rad import db
 
-from rad.models import db
 
-
-def create_app(config):
+def create_app(config_name=None):
 
     app = Flask(__name__)
-    app.config.from_object(config)
+    app.config.from_object(get_config_by(config_name))
 
     from remedyblueprint import remedy, url_for_other_page
     app.register_blueprint(remedy)
@@ -39,14 +36,4 @@ def create_app(config):
     from flask_wtf.csrf import CsrfProtect
     CsrfProtect(app)
 
-    Migrate(app, db, directory=app.config['MIGRATIONS_DIR'])
-
-    manager = Manager(app)
-    manager.add_command('db', MigrateCommand)
-
-    # turning API off for now
-    # from api_manager import init_api_manager
-    # api_manager = init_api_manager(app, db)
-    # map(lambda m: api_manager.create_api(m), models)
-    
-    return app, manager
+    return app
